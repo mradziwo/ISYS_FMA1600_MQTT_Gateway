@@ -24,15 +24,15 @@ class communicationConfig:
     
 class dummy_communication(communication):
     def start(self, config):
-        print "configured"
+        print ("configured")
     def stop(self):
-        print "stopped"
+        print ("stopped")
     def write(self,message):
-        print "Message to write:", message
+        print ("Message to write:", message)
     def read(self,n):
         t="A +042.81 +022.70 +000000 +000000     CH4\r"
         req=t[:n]
-        print "read request returns:", req
+        print ("read request returns:", req)
         return(req)
     
 class RSOverMoxa(communication):
@@ -130,16 +130,16 @@ FlowMeterDevice=FMA1600(RSOverMoxa,config);
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to "+MQTTIP+":"+str(MQTTPort)+" with result code "+str(rc)
-    print line
+    print (line)
     client.publish(device_root+"/Info/Status", "Online" )
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(device_root+"/Tare")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Tare"
-    print line
+    print (line)
     client.subscribe(device_root+"/Disconnect")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Disconnect"
-    print line
+    print (line)
 
     
 # The callback for when a PUBLISH message is received from the server.
@@ -154,7 +154,7 @@ def Tare_callback(client, userdata, message):
     
 def do_disconnect(client, userdata, message):
     client.disconnect()
-    print datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tClient disconnected from server"
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tClient disconnected from server")
 
     
 username=MQTTUser
@@ -190,4 +190,4 @@ for i in range (0,10):
     
 client.disconnect()
 FlowMeterDevice.stop()
-print datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3], "]\tProcess stopped"
+print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3], "]\tProcess stopped")
