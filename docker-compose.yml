@@ -1,0 +1,7 @@
+version: "3"
+services:
+  FMA1600_MQTT_Gateway:
+    image: mradziwo/FMA1600MQTTGateway
+    ports:
+    - "1883:1883"
+
