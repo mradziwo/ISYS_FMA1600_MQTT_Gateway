@@ -87,7 +87,6 @@ class FMA1600(FlowMeter):
         
     def tare(self):
         
-        print self._channel
         self._channel.write(self.TareString)
     
     def poll(self):
