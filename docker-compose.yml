@@ -1,7 +1,7 @@
 version: "3"
 services:
   FMA1600_MQTT_Gateway:
-    image: mradziwo/FMA1600MQTTGateway
+    image: docker pull mradziwo/isys_fma1600_mqtt_gateway:latest
     ports:
       - "1883:1883"
     restart: unless-stopped
