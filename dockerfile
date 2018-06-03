@@ -12,3 +12,5 @@ COPY . /app
 ENTRYPOINT [ "python" ]
 
 CMD [ "app.py" ]
+
+VOLUME [ "/config" ]
