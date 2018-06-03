@@ -71,8 +71,8 @@ class FlowMeter:
 
 class FMA1600(FlowMeter):
     
-    TareString="A$$V\r"
-    QuerryString="A\r"
+    TareString="A$$V\r".encode()
+    QuerryString="A\r".encode()
     ReplyLen=42
     
     def __init__ (self, channel,config):
@@ -91,7 +91,7 @@ class FMA1600(FlowMeter):
     
     def poll(self):
         self._channel.write(self.QuerryString)
-        reply=self._channel.read(self.ReplyLen)
+        reply=self._channel.read(self.ReplyLen).decode()
         w= reply.split(" ")
         p=0.0689476*float(w[1])
         t=float(w[2])
