@@ -7,5 +7,5 @@ services:
     restart: unless-stopped
     network_mode: bridge
     volumes:
-      - /home/containers/fma1600/config:/config
+      - /home/containers/fma1600/config:/app/config
 

@@ -13,4 +13,4 @@ ENTRYPOINT [ "python" ]
 
 CMD [ "app.py" ]
 
-VOLUME [ "/config" ]
+VOLUME [ "/app/config" ]
