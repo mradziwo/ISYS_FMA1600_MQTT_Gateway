@@ -5,6 +5,7 @@ import socket
 import yaml
 from datetime import datetime  
 import shutil
+import sys
 
 
 class communication:
@@ -45,7 +46,7 @@ class RSOverMoxa(communication):
             print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\t Connected to RS485 gateway: "+config.ip+":",config.port)
         except socket.error as e:
             print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting :: %s" % e)
-        
+        sys.stdout.flush()
         
 
         
@@ -116,9 +117,11 @@ try:
 except yaml.YAMLError as exc:
     print ("Error processing configuration file")
     print(exc)
+    sys.stdout.flush()
 except IOError as exc:
     if exc.errno == 2:
         print ("Configuration file \\config\\config.yaml not found. Substituting with default configuration.")
+        sys.stdout.flush()
         shutil.copy("config.yaml", ".\\config\\config.yaml")
         try:
             with open(".\\config\\config.yaml", 'r') as stream:
@@ -126,6 +129,7 @@ except IOError as exc:
         except yaml.YAMLError as exc:
             print ("Error processing configuration file")
             print(exc)
+            sys.stdout.flush()
     else:
         raise
         
@@ -161,7 +165,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(device_root+"/Disconnect")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Disconnect"
     print (line)
-
+    sys.stdout.flush()
     
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -176,7 +180,7 @@ def Tare_callback(client, userdata, message):
 def do_disconnect(client, userdata, message):
     client.disconnect()
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received disconnected request via "+device_root+"/Disconnect")
-
+    sys.stdout.flush()
     
 username=MQTTUser
 password=MQTTPassword
@@ -193,7 +197,7 @@ client.message_callback_add(device_root+"/Disconnect", do_disconnect)
 
 try:
     client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\t Connected to MQTT Broker: "+MQTTIP+":",MQTTPort)
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to MQTT Broker: "+MQTTIP+":",MQTTPort)
 except socket.error as e:
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting to MQTT broker :: %s" % e)
 
@@ -220,4 +224,5 @@ while True:
     
 client.disconnect()
 FlowMeterDevice.stop()
-print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tProcess stopped")
+print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tProcess stopped")
+sys.stdout.flush()
