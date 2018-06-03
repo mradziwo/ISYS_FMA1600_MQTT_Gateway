@@ -39,7 +39,15 @@ class RSOverMoxa(communication):
     def start(self,config):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self._socket.connect(("192.168.20.119", 4001))
-        self._socket.connect((config.ip, config.port))
+        try:
+            self._socket.connect((config.ip, config.port))
+            print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\t Connected to RS485 gateway: "+config.ip+":",config.port)
+        except socket.error as e:
+            print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tError while connecting :: %s" % e)
+            break
+        
+        
+
         
     def stop(self):
         self._socket.close()
@@ -153,7 +161,7 @@ def Tare_callback(client, userdata, message):
     
 def do_disconnect(client, userdata, message):
     client.disconnect()
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tClient disconnected from server")
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tClient received disconnected request via "+device_root+"/Disconnect")
 
     
 username=MQTTUser
@@ -168,7 +176,15 @@ client.on_message = on_message
 client.message_callback_add(device_root+"/Tare", Tare_callback)
 client.message_callback_add(device_root+"/Disconnect", do_disconnect)
 
-client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
+
+try:
+    client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\t Connected to MQTT Broker: "+MQTTIP+":",MQTTPort)
+except socket.error as e:
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tError while connecting to MQTT broker :: %s" % e)
+    break
+
+
 
 
 # Blocking call that processes network traffic, dispatches callbacks and
@@ -176,7 +192,7 @@ client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 client.loop_start()
-for i in range (0,10):
+while True
     p, t, mq = FlowMeterDevice.poll()
     pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"}}
     client.publish(device_root+"/Data/All", json.dumps(pack) )
@@ -189,4 +205,4 @@ for i in range (0,10):
     
 client.disconnect()
 FlowMeterDevice.stop()
-print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3], "]\tProcess stopped")
+print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tProcess stopped")
