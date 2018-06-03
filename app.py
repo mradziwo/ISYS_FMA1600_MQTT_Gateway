@@ -186,6 +186,10 @@ def do_disconnect(client, userdata, message):
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received disconnected request via "+device_root+"/Disconnect")
     sys.stdout.flush()
     
+
+
+print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\t FMA1600 MQTT Gateway V 0.0.1)")
+
 username=MQTTUser
 password=MQTTPassword
 
