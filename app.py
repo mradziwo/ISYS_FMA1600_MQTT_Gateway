@@ -44,7 +44,6 @@ class RSOverMoxa(communication):
             print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\t Connected to RS485 gateway: "+config.ip+":",config.port)
         except socket.error as e:
             print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tError while connecting :: %s" % e)
-            break
         
         
 
@@ -103,9 +102,9 @@ class FMA1600(FlowMeter):
         w= reply.split(" ")
         p=0.0689476*float(w[1])
         t=float(w[2])
-        q=float(w[3])
         mq=float(w[4])
-        return(p, t, mq)
+        P=float(w[4])*0.54644058                    #nlpm to kW @CH4 conversion
+        return(p, t, mq, P)
 
 
 
@@ -132,7 +131,7 @@ ScanRate=conf["Settings"]["ScanRate"]
 
 device_root=MQTTRootPath
 config=communicationConfig(MOXAIP,MOXAPort)
-FlowMeterDevice=FMA1600(RSOverMoxa,config);
+FlowMeterDevice=FMA1600(RSOverMoxa,config)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -182,7 +181,6 @@ try:
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\t Connected to MQTT Broker: "+MQTTIP+":",MQTTPort)
 except socket.error as e:
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3],"]\tError while connecting to MQTT broker :: %s" % e)
-    break
 
 
 
@@ -194,12 +192,13 @@ except socket.error as e:
 client.loop_start()
 
 while True:
-    p, t, mq = FlowMeterDevice.poll()
-    pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"}}
+    p, t, mq, P = FlowMeterDevice.poll()
+    pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
     client.publish(device_root+"/Data/All", json.dumps(pack) )
     client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
     client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
-    y=client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
+    client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
+    y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
     if y[0] == 4:
         break
     time.sleep(ScanRate)
