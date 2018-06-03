@@ -112,7 +112,7 @@ class FMA1600(FlowMeter):
 
 
 try:
-    with open(".\\config\\config.yaml", 'r') as stream:
+    with open("./config/config.yaml", 'r') as stream:
         conf=yaml.load(stream)
 except yaml.YAMLError as exc:
     print ("Error processing configuration file")
@@ -122,9 +122,9 @@ except IOError as exc:
     if exc.errno == 2:
         print ("Configuration file \\config\\config.yaml not found. Substituting with default configuration.")
         sys.stdout.flush()
-        shutil.copy("config.yaml", ".\\config\\config.yaml")
+        shutil.copy("config.yaml", "./config/config.yaml")
         try:
-            with open(".\\config\\config.yaml", 'r') as stream:
+            with open("./config/config.yaml", 'r') as stream:
                 conf=yaml.load(stream)
         except yaml.YAMLError as exc:
             print ("Error processing configuration file")
