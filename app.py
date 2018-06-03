@@ -50,7 +50,7 @@ class RSOverMoxa(communication):
     def read(self,n):
         message=""
         while len(message) <n:
-            message = message+self._socket.recv(1024)
+            message = message+self._socket.recv(1024).decode()
         return (message)
 
 
@@ -91,7 +91,7 @@ class FMA1600(FlowMeter):
     
     def poll(self):
         self._channel.write(self.QuerryString)
-        reply=self._channel.read(self.ReplyLen).decode()
+        reply=self._channel.read(self.ReplyLen)
         w= reply.split(" ")
         p=0.0689476*float(w[1])
         t=float(w[2])
