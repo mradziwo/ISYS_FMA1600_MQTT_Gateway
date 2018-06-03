@@ -3,5 +3,9 @@ services:
   FMA1600_MQTT_Gateway:
     image: mradziwo/FMA1600MQTTGateway
     ports:
-    - "1883:1883"
+      - "1883:1883"
+    restart: unless-stopped
+    network_mode: bridge
+    volumes:
+      - /home/containers/fma1600/config:/config
 
