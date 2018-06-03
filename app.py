@@ -192,7 +192,8 @@ except socket.error as e:
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 client.loop_start()
-while True
+
+while True:
     p, t, mq = FlowMeterDevice.poll()
     pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"}}
     client.publish(device_root+"/Data/All", json.dumps(pack) )
