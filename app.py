@@ -43,7 +43,7 @@ class RSOverMoxa(communication):
         #self._socket.connect(("192.168.20.119", 4001))
         try:
             self._socket.connect((config.ip, config.port))
-            print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\t Connected to RS485 gateway: "+config.ip+":",config.port)
+            print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to RS485 gateway: "+config.ip+":",config.port)
         except socket.error as e:
             print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting :: %s" % e)
         sys.stdout.flush()
@@ -174,6 +174,8 @@ def on_message(client, userdata, msg):
     
 def Tare_callback(client, userdata, message):
     if message.payload == 1:
+        print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
+        sys.stdout.flush()
         FlowMeterDevice.tare()
         
     
