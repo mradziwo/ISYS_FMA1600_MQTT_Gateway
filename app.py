@@ -141,7 +141,7 @@ def on_message(client, userdata, msg):
 def Tare_callback(client, userdata, message):
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare"+" PAYLOAD: "+str(message.payload))
     sys.stdout.flush()
-    if str(message.payload) == b'1':
+    if message.payload == '1':
         print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
         sys.stdout.flush()
         FlowMeterDevice.tare()
