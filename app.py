@@ -97,7 +97,6 @@ class FMA1600(FlowMeter):
         self._channel.stop()
         
     def tare(self):
-        
       print ("Tare request")  
       #  with self.mutex:
       #      self._channel.write(self.TareString)
@@ -147,13 +146,13 @@ def on_message(client, userdata, msg):
 
     
 def Tare_callback(client, userdata, message):
-    #print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare"+"PAYLOAD:"+message.payload)
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare"+"PAYLOAD:"+message.payload)
     print ("dupa")
     sys.stdout.flush()
-    #if message.payload == "1":
-    #    print("blada")
-       # print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
-    #    sys.stdout.flush()
+    if message.payload == "1":
+        print("blada")
+        print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
+        sys.stdout.flush()
         #FlowMeterDevice.tare()
         
     
@@ -212,8 +211,9 @@ if __name__ == "__main__":
 
     device_root=MQTTRootPath
     config=communicationConfig(MOXAIP,MOXAPort)
-    FlowMeterDevice=FMA1600(RSOverMoxa,config)
+    #FlowMeterDevice=FMA1600(RSOverMoxa,config)
 
+    FlowMeterDevice=FMA1600(dummy_communication,config)
     username=MQTTUser
     password=MQTTPassword
 
