@@ -131,13 +131,6 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(device_root+"/Disconnect")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Disconnect"
     print (line)
-    client.subscribe(device_root+"/T")
-    line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/T"
-    print (line)
-    
-    client.subscribe(device_root+"/T3")
-    line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/T3"
-    print (line)
     sys.stdout.flush()
     
 # The callback for when a PUBLISH message is received from the server.
@@ -148,25 +141,16 @@ def on_message(client, userdata, msg):
 def Tare_callback(client, userdata, message):
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare"+" PAYLOAD: "+str(message.payload))
     sys.stdout.flush()
-    if str(message.payload) == "1":
+    if str(message.payload) == b'1':
         print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
         sys.stdout.flush()
         FlowMeterDevice.tare()
         
-    
-
-
-
-
 def do_disconnect(client, userdata, message):
     client.disconnect()
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received disconnected request via "+device_root+"/Disconnect")
     sys.stdout.flush()
 
-def do_t3(client, userdata, message):
-    
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received t3 request via /T3")
-    sys.stdout.flush()   
 
 
 if __name__ == "__main__":
@@ -205,7 +189,7 @@ if __name__ == "__main__":
     ScanRate=conf["Settings"]["ScanRate"]
 
 
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.1")
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.2")
 
     device_root=MQTTRootPath
     config=communicationConfig(MOXAIP,MOXAPort)
@@ -223,7 +207,6 @@ if __name__ == "__main__":
 
     client.message_callback_add(device_root+"/Tare", Tare_callback)
     client.message_callback_add(device_root+"/Disconnect", do_disconnect)
-    client.message_callback_add(device_root+"/T3", do_t3)
 
 
     try:
