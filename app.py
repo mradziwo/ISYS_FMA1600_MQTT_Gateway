@@ -145,7 +145,7 @@ def Tare_callback(client, userdata, message):
     if message.payload == "1":
         print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received Tare request via "+device_root+"/Tare")
         sys.stdout.flush()
-        FlowMeterDevice.tare()
+        #FlowMeterDevice.tare()
         
     
 def do_disconnect(client, userdata, message):
