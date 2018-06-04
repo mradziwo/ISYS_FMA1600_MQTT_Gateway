@@ -6,6 +6,7 @@ import yaml
 from datetime import datetime  
 import shutil
 import sys
+import threading
 
 
 class communication:
@@ -80,6 +81,7 @@ class FlowMeter:
 
 class FMA1600(FlowMeter):
     
+    mutex = threading.Lock()
     TareString="A$$V\r".encode()
     QuerryString="A\r".encode()
     ReplyLen=42
@@ -96,11 +98,16 @@ class FMA1600(FlowMeter):
         
     def tare(self):
         
-        self._channel.write(self.TareString)
+        
+        with self.mutex:
+            self._channel.write(self.TareString)
+
+
     
     def poll(self):
-        self._channel.write(self.QuerryString)
-        reply=self._channel.read(self.ReplyLen)
+        with self.mutex:
+            self._channel.write(self.QuerryString)
+            reply=self._channel.read(self.ReplyLen)
         w= reply.split(" ")
         p=0.0689476*float(w[1])
         t=float(w[2])
@@ -111,46 +118,6 @@ class FMA1600(FlowMeter):
 
 
 
-try:
-    with open("./config/config.yaml", 'r') as stream:
-        conf=yaml.load(stream)
-except yaml.YAMLError as exc:
-    print ("Error processing configuration file")
-    print(exc)
-    sys.stdout.flush()
-except IOError as exc:
-    if exc.errno == 2:
-        print ("Configuration file \\config\\config.yaml not found. Substituting with default configuration.")
-        sys.stdout.flush()
-        shutil.copy("config.yaml", "./config/config.yaml")
-        try:
-            with open("./config/config.yaml", 'r') as stream:
-                conf=yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print ("Error processing configuration file")
-            print(exc)
-            sys.stdout.flush()
-    else:
-        raise
-        
-MQTTIP=conf["MQTT"]["IP"]
-MQTTPort=conf["MQTT"]["Port"]
-MQTTUser=conf["MQTT"]["User"]
-MQTTPassword=conf["MQTT"]["Password"]
-MQTTKeepAlive=conf["MQTT"]["KeepAlive"]
-MQTTRootPath=conf["MQTT"]["rootPath"]
-
-MOXAIP=conf["Moxa"]["IP"]
-MOXAPort=conf["Moxa"]["Port"]
-
-ScanRate=conf["Settings"]["ScanRate"]
-
-
-
-
-device_root=MQTTRootPath
-config=communicationConfig(MOXAIP,MOXAPort)
-FlowMeterDevice=FMA1600(RSOverMoxa,config)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -188,49 +155,90 @@ def do_disconnect(client, userdata, message):
     
 
 
-print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\t FMA1600 MQTT Gateway V 0.0.1)")
+if __name__ == "__main__":
+    try:
+        with open("./config/config.yaml", 'r') as stream:
+            conf=yaml.load(stream)
+    except yaml.YAMLError as exc:
+        print ("Error processing configuration file")
+        print(exc)
+        sys.stdout.flush()
+    except IOError as exc:
+        if exc.errno == 2:
+            print ("Configuration file \\config\\config.yaml not found. Substituting with default configuration.")
+            sys.stdout.flush()
+            shutil.copy("config.yaml", "./config/config.yaml")
+            try:
+                with open("./config/config.yaml", 'r') as stream:
+                    conf=yaml.load(stream)
+            except yaml.YAMLError as exc:
+                print ("Error processing configuration file")
+                print(exc)
+                sys.stdout.flush()
+        else:
+            raise
+            
+    MQTTIP=conf["MQTT"]["IP"]
+    MQTTPort=conf["MQTT"]["Port"]
+    MQTTUser=conf["MQTT"]["User"]
+    MQTTPassword=conf["MQTT"]["Password"]
+    MQTTKeepAlive=conf["MQTT"]["KeepAlive"]
+    MQTTRootPath=conf["MQTT"]["rootPath"]
 
-username=MQTTUser
-password=MQTTPassword
+    MOXAIP=conf["Moxa"]["IP"]
+    MOXAPort=conf["Moxa"]["Port"]
 
-client = mqtt.Client(client_id="OMEGAREADER")
-client.username_pw_set(username, password=None)
-client.will_set(device_root+"/Info/Status", payload="Offline", qos=0, retain=True)
-client.on_connect = on_connect
-client.on_message = on_message
-
-client.message_callback_add(device_root+"/Tare", Tare_callback)
-client.message_callback_add(device_root+"/Disconnect", do_disconnect)
+    ScanRate=conf["Settings"]["ScanRate"]
 
 
-try:
-    client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to MQTT Broker: "+MQTTIP+":",MQTTPort)
-except socket.error as e:
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting to MQTT broker :: %s" % e)
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.1")
+
+    device_root=MQTTRootPath
+    config=communicationConfig(MOXAIP,MOXAPort)
+    FlowMeterDevice=FMA1600(RSOverMoxa,config)
+
+    username=MQTTUser
+    password=MQTTPassword
+
+    client = mqtt.Client(client_id="OMEGAREADER")
+    client.username_pw_set(username, password=None)
+    client.will_set(device_root+"/Info/Status", payload="Offline", qos=0, retain=True)
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.message_callback_add(device_root+"/Tare", Tare_callback)
+    client.message_callback_add(device_root+"/Disconnect", do_disconnect)
+
+
+    try:
+        client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
+        print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to MQTT Broker: "+MQTTIP+":",MQTTPort)
+    except socket.error as e:
+        print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting to MQTT broker :: %s" % e)
 
 
 
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-client.loop_start()
+    # Blocking call that processes network traffic, dispatches callbacks and
+    # handles reconnecting.
+    # Other loop*() functions are available that give a threaded interface and a
+    # manual interface.
+    client.loop_start()
 
-while True:
-    p, t, mq, P = FlowMeterDevice.poll()
-    pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
-    client.publish(device_root+"/Data/All", json.dumps(pack) )
-    client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
-    client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
-    client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
-    y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
-    if y[0] == 4:
-        break
-    time.sleep(ScanRate)
-    
-client.disconnect()
-FlowMeterDevice.stop()
-print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tProcess stopped")
-sys.stdout.flush()
+    while True:
+        p, t, mq, P = FlowMeterDevice.poll()
+        pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
+        client.publish(device_root+"/Data/All", json.dumps(pack) )
+        client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
+        client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
+        client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
+        y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
+        if y[0] == 4:
+            break
+        time.sleep(ScanRate)
+        
+    client.disconnect()
+    client.loop_stop(force=False)
+    FlowMeterDevice.stop()
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tProcess stopped")
+    sys.stdout.flush()
