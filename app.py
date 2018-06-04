@@ -132,6 +132,9 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(device_root+"/Disconnect")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Disconnect"
     print (line)
+    client.subscribe(device_root+"/T")
+    line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/T"
+    print (line)
     sys.stdout.flush()
     
 # The callback for when a PUBLISH message is received from the server.
