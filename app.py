@@ -97,9 +97,9 @@ class FMA1600(FlowMeter):
         self._channel.stop()
         
     def tare(self):
-      print ("Tare request")  
-      #  with self.mutex:
-      #      self._channel.write(self.TareString)
+        print ("Tare request")  
+        with self.mutex:
+            self._channel.write(self.TareString)
 
 
     
