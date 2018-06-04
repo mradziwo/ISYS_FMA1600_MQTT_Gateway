@@ -166,7 +166,7 @@ def do_disconnect(client, userdata, message):
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received disconnected request via "+device_root+"/Disconnect")
     sys.stdout.flush()
 
- def do_t3(client, userdata, message):
+def do_t3(client, userdata, message):
     
     print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tClient received t3 request via /T3")
     sys.stdout.flush()   
