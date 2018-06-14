@@ -215,7 +215,7 @@ if __name__ == "__main__":
     print("Subscribed to:")
     print(device_root+"/Tare\t\tTares the meter")
     print(device_root+"/Disconnect\t\t Disconnectes system")
-    print("Publishing: ")
+    print("Publishing:  ")
     print(device_root+"/Info/Status\t\t Status of device")
     print(device_root+"/Data/All\t\t All data as json struct")
     print(device_root+"/Data/Pressure\t\t Pressure as json struct")
