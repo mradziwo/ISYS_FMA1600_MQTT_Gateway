@@ -61,6 +61,8 @@ class RSOverMoxa(communication):
         message=""
         while len(message) <n:
             message = message+self._socket.recv(1024).decode()
+        
+        del message[-4:-2]  #crappy implementation of modbus
         return (message)
 
 
