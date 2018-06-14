@@ -133,6 +133,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(device_root+"/Disconnect")
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tSubscribed to: "+device_root+"/Disconnect"
     print (line)
+    print ("Publish list:")
     sys.stdout.flush()
     
 # The callback for when a PUBLISH message is received from the server.
@@ -209,7 +210,18 @@ if __name__ == "__main__":
 
     client.message_callback_add(device_root+"/Tare", Tare_callback)
     client.message_callback_add(device_root+"/Disconnect", do_disconnect)
-
+    
+    print("Base path: "+device_root)
+    print("Subscribed to:")
+    print(device_root+"/Tare\t\tTares the meter")
+    print(device_root+"/Disconnect\t\t Disconnectes system")
+    print("Publishing: ")
+    print(device_root+"/Info/Status\t\t Status of device")
+    print(device_root+"/Data/All\t\t All data as json struct")
+    print(device_root+"/Data/Pressure\t\t Pressure as json struct")
+    print(device_root+"/Data/Temperature\t\t Temperature as json struct")
+    print(device_root+"/Data/Flow\t\t Compensated Flow as json struct")
+    print(device_root+"/Data/Power\t\t Power as json struct")
 
     try:
         client.connect(MQTTIP, MQTTPort, MQTTKeepAlive)
