@@ -229,7 +229,8 @@ if __name__ == "__main__":
     except socket.error as e:
         print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tError while connecting to MQTT broker :: %s" % e)
 
-
+    
+    sys.stdout.flush()
 
 
     # Blocking call that processes network traffic, dispatches callbacks and
