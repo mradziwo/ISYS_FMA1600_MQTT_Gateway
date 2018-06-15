@@ -157,6 +157,7 @@ def do_disconnect(client, userdata, message):
 
 
 if __name__ == "__main__":
+    print("The Python version is %s.%s.%s" % sys.version_info[:3])
     try:
         with open("./config/config.yaml", 'r') as stream:
             conf=yaml.load(stream)
