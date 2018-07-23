@@ -213,7 +213,7 @@ if __name__ == "__main__":
     print("Subscribed to:")
     print("\t"+device_root+"/Tare               Payload b'1' Tares the meter")
     print("\t"+device_root+"/Disconnect         Disconnectes system")
-    print("Publishing:  ")
+    print("Publishing:  @"+str(ScanRate)+"s")
     print("\t"+device_root+"/Info/Status        Status of the device (Online|Offline)")
     print("\t"+device_root+"/Data/All           All data as json struct")
     print("\t"+device_root+"/Data/Pressure      Pressure as json struct")
