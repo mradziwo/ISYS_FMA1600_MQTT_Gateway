@@ -211,10 +211,10 @@ if __name__ == "__main__":
     
     print("Base path: \n\t"+device_root)
     print("Subscribed to:")
-    print("\t"+device_root+"/Tare               Tares the meter")
+    print("\t"+device_root+"/Tare               Payload b'1' Tares the meter")
     print("\t"+device_root+"/Disconnect         Disconnectes system")
     print("Publishing:  ")
-    print("\t"+device_root+"/Info/Status        Status of device")
+    print("\t"+device_root+"/Info/Status        Status of the device (Online|Offline)")
     print("\t"+device_root+"/Data/All           All data as json struct")
     print("\t"+device_root+"/Data/Pressure      Pressure as json struct")
     print("\t"+device_root+"/Data/Temperature   Temperature as json struct")
