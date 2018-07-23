@@ -236,7 +236,7 @@ if __name__ == "__main__":
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
     client.loop_start()
-
+    client.publish(device_root+"/Info/Status ", "Online" )
     while True:
         p, t, mq, P = FlowMeterDevice.poll()
         pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
