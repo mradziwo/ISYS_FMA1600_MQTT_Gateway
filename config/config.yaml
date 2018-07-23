@@ -4,7 +4,7 @@ MQTT:
   KeepAlive: 60
   User: ""
   Password: ""
-  rootPath: "WIATA"
+  rootPath: "WIATA/OMEGA"
 Moxa:
   IP: "192.168.20.119"
   Port: 4001
