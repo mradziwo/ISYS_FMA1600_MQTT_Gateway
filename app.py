@@ -122,7 +122,7 @@ class FMA1600(FlowMeter):
 def on_connect(client, userdata, flags, rc):
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to "+MQTTIP+":"+str(MQTTPort)+" with result code "+str(rc)
     print (line)
-    client.publish(device_root+"/Info/Status", "Online" )
+    client.publish(device_root+"/Info/Status", "Online" , retain=True)
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(device_root+"/Tare")
