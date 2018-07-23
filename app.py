@@ -122,7 +122,7 @@ class FMA1600(FlowMeter):
 def on_connect(client, userdata, flags, rc):
     line=datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tConnected to "+MQTTIP+":"+str(MQTTPort)+" with result code "+str(rc)
     print (line)
-    client.publish(device_root+"/Info/Status", "Online" , retain=True)
+    client.publish(device_root+"/Info/Status", "Online", retain=True ) )
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(device_root+"/Tare")
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     ScanRate=conf["Settings"]["ScanRate"]
 
 
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.2")
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.3")
 
     device_root=MQTTRootPath
     config=communicationConfig(MOXAIP,MOXAPort)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
     client.loop_start()
-    client.publish(device_root+"/Info/Status ", "Online" )
+    
     while True:
         p, t, mq, P = FlowMeterDevice.poll()
         pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
@@ -248,7 +248,7 @@ if __name__ == "__main__":
         if y[0] == 4:
             break
         time.sleep(ScanRate)
-        
+    client.publish(device_root+"/Info/Status ", "Offline" )    
     client.disconnect()
     client.loop_stop(force=False)
     FlowMeterDevice.stop()
