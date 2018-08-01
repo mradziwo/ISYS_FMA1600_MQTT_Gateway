@@ -104,14 +104,16 @@ class FMA1600(FlowMeter):
 
     
     def poll(self):
-        with self.mutex:
-            self._channel.write(self.QuerryString)
-            reply=self._channel.read(self.ReplyLen)
-        w= reply.split(" ")
-        p=0.0689476*float(w[1])
-        t=float(w[2])
-        mq=float(w[4])
-        P=float(w[4])*0.54644058                    #nlpm to kW @CH4 conversion
+        try:
+            with self.mutex:
+                self._channel.write(self.QuerryString)
+                reply=self._channel.read(self.ReplyLen)
+            w= reply.split(" ")
+            p=0.0689476*float(w[1])
+            t=float(w[2])
+            mq=float(w[4])
+            P=float(w[4])*0.54644058                    #nlpm to kW @CH4 conversion
+        except Exception as e: print(e)
         return(p, t, mq, P)
 
 
@@ -238,15 +240,18 @@ if __name__ == "__main__":
     client.loop_start()
     
     while True:
-        p, t, mq, P = FlowMeterDevice.poll()
-        pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
-        client.publish(device_root+"/Data/All", json.dumps(pack) )
-        client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
-        client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
-        client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
-        y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
-        if y[0] == 4:
-            break
+        try:
+            p, t, mq, P = FlowMeterDevice.poll()
+            pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
+            client.publish(device_root+"/Data/All", json.dumps(pack) )
+            client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
+            client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
+            client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
+            y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
+            if y[0] == 4:
+                break
+        except Exception as e: 
+            print(e)
         time.sleep(ScanRate)
     client.publish(device_root+"/Info/Status ", "Offline" )    
     client.disconnect()
