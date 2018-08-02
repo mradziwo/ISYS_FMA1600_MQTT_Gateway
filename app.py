@@ -192,7 +192,7 @@ if __name__ == "__main__":
     ScanRate=conf["Settings"]["ScanRate"]
 
 
-    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.3")
+    print (datetime.utcnow().strftime('[%Y-%m-%d %H:%M:%S.%f')[:-3]+"]\tFMA1600 MQTT Gateway V 0.0.4")
 
     device_root=MQTTRootPath
     config=communicationConfig(MOXAIP,MOXAPort)
@@ -240,14 +240,17 @@ if __name__ == "__main__":
     client.loop_start()
     
     while True:
+        print("tick")
         try:
             p, t, mq, P = FlowMeterDevice.poll()
+            print(p)
             pack={"Pressure":{"Value":p,"Unit":"bar"}, "Temperature":{"Value":t, "Unit":"°C"},"Flow":{"Value":mq, "Unit": "nlpm"},"Power":{"Value":P, "Unit": "kW"}}
             client.publish(device_root+"/Data/All", json.dumps(pack) )
             client.publish(device_root+"/Data/Pressure", json.dumps(pack["Pressure"]))
             client.publish(device_root+"/Data/Temperature", json.dumps(pack["Temperature"]))
             client.publish(device_root+"/Data/Flow", json.dumps(pack["Flow"]))
             y=client.publish(device_root+"/Data/Power", json.dumps(pack["Power"]))
+            print(y)
             if y[0] == 4:
                 break
         except Exception as e: 
